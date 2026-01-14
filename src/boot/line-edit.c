@@ -25,7 +25,7 @@ static void cursor_right(size_t *cursor, size_t *first, size_t x_max, size_t len
                 (*first)++;
 }
 
-bool line_edit(char16_t **line_in, size_t x_max, size_t y_pos) {
+bool line_edit(char16_t **line_in, size_t x_max, size_t y_pos, const EfiPalette *palette) {
         _cleanup_free_ char16_t *line = NULL, *print = NULL;
         size_t size, len, first = 0, cursor = 0, clear = 0;
 
@@ -42,7 +42,8 @@ bool line_edit(char16_t **line_in, size_t x_max, size_t y_pos) {
         for (;;) {
                 EFI_STATUS err;
                 uint64_t key;
-                size_t j, cursor_color = EFI_TEXT_ATTR_SWAP(COLOR_EDIT);
+                size_t j;
+                bool is_cursor_color = true;
 
                 j = MIN(len - first, x_max);
                 memcpy(print, line + first, j * sizeof(char16_t));
@@ -53,20 +54,21 @@ bool line_edit(char16_t **line_in, size_t x_max, size_t y_pos) {
                 print[j] = '\0';
 
                 /* See comment at edit_line() call site for why we start at 1. */
-                print_at(1, y_pos, COLOR_EDIT, print);
+                print_at(1, y_pos, palette[EFI_PALETTE_COLORS_TEXT], print);
 
                 if (!print[cursor])
                         print[cursor] = ' ';
                 print[cursor+1] = '\0';
                 do {
+                        size_t cursor_color = palette[is_cursor_color ? EFI_PALETTE_COLORS_CURSOR : EFI_PALETTE_COLORS_TEXT];
                         print_at(cursor + 1, y_pos, cursor_color, print + cursor);
-                        cursor_color = EFI_TEXT_ATTR_SWAP(cursor_color);
+                        is_cursor_color = !is_cursor_color;
 
                         err = console_key_read(&key, 750 * 1000);
                         if (!IN_SET(err, EFI_SUCCESS, EFI_TIMEOUT, EFI_NOT_READY))
                                 return false;
 
-                        print_at(cursor + 1, y_pos, COLOR_EDIT, print + cursor);
+                        print_at(cursor + 1, y_pos, palette[EFI_PALETTE_COLORS_TEXT], print + cursor);
                 } while (err != EFI_SUCCESS);
 
                 switch (key) {
