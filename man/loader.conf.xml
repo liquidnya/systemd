@@ -513,6 +513,80 @@ sbvarsign --attr "${attr}" --key KEK.key --cert KEK.pem --output db.auth db db.e
 
         <xi:include href="version-info.xml" xpointer="v259"/></listitem>
       </varlistentry>
+
+      <varlistentry>
+        <term>efi-palette-normal</term>
+        <term>efi-palette-entry</term>
+        <term>efi-palette-edit</term>
+
+        <listitem><para>Controls the foreground and background colors used by
+        <citerefentry><refentrytitle>systemd-boot</refentrytitle><manvolnum>7</manvolnum></citerefentry>.
+        </para>
+
+        <para>Each palette consists of four colors separated by comma (<literal>,</literal>):</para>
+
+        <itemizedlist>
+          <listitem><para>foreground color</para></listitem>
+
+          <listitem><para>background color</para></listitem>
+
+          <listitem><para>foreground color for the cursor or entry highlight</para></listitem>
+
+          <listitem><para>background color for the cursor or entry highlight</para></listitem>
+        </itemizedlist>
+
+        <para>Note that whitespace is ignored and you may add a trailling comma.</para>
+
+        <para>The value of  <literal>emerg</literal>, <literal>alert</literal>, <literal>crit</literal>,
+        <literal>err</literal>, <literal>warning</literal>, <literal>notice</literal>,
+        <literal>info</literal>, and <literal>debug</literal>.</para>
+
+        <para>If unspecified, <literal>info</literal> will be used, unless one has already been configured
+        via an SMBIOS Type 11 string, see
+        <citerefentry><refentrytitle>smbios-type-11</refentrytitle><manvolnum>7</manvolnum></citerefentry>.
+        </para>
+
+        <para>Note that the configured level will only be used after <filename>loader.conf</filename> has
+        been parsed, so log messages generated before that point may be unaffected by this setting.</para>
+
+
+
+        To allow users to change colors for the bootloader without needing to recompile systemd,
+
+the following config options are added:
+
+efi-palette-normal: colors for the normal text
+
+efi-palette-entry: colors for the boot entries and highligted boot entries
+
+efi-palette-edit: colors for the editor and the cursor of the editor
+
+Each configuration consists of an array of 4 colors separated by comma (,) for
+
+the following purpose:
+
+foreground color
+
+background color
+
+foreground color of the highlight/cursor
+
+background color of the highlight/cursor
+
+A trailling comma is allowed.
+
+Note that efi-palette-normal accepts 4 colors,
+
+but the highlight/cursor color is unused (for now).
+
+If only the foreground color and background color is set,
+
+the highlight/cursor color will be set to the same colors,
+
+but foreground and background are swapped.
+
+        <xi:include href="version-info.xml" xpointer="v262"/></listitem>
+      </varlistentry>
     </variablelist>
   </refsect1>
 
